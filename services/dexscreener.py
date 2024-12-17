@@ -40,6 +40,21 @@ class DexScreenerService:
                 return None
     
     @staticmethod
+    async def fetch_(token_address: str) -> Optional[Dict[str, Any]]:
+        # Fetch pair information from DexScreener API
+        url = f"https://api.rugcheck.xyz/v1/tokens/{token_address}/report/summary"
+        print(url)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                print(response.status)
+                if response.status == 200:
+                    data = await response.json()
+                    print(data)
+                    if data:
+                        return data
+                return None
+
+    @staticmethod
     async def fetch_first_token_url() -> Optional[str]:
         # Fetches the first token profile URL from DexScreener API
         # Returns: URL string or None if not found/error

@@ -1,8 +1,27 @@
 import discord
 from bot.client import PonderBot
 from services.dexscreener import DexScreenerService
+from db.database import Database
 
 def setup_commands(client: PonderBot):
+    @client.tree.command(name="sync", description="Syncs the command tree (Admin only)")
+    async def sync(interaction: discord.Interaction):
+        # Check if user has administrator permissions
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message("You must be an administrator to use this command.", ephemeral=True)
+            return
+        
+        try:
+            # Defer the response since syncing might take a moment
+            await interaction.response.defer(ephemeral=True)
+            print('syncing...')
+            # Sync the command tree
+            await client.tree.sync()
+            
+            await interaction.followup.send("Successfully synced bot commands!", ephemeral=True)
+        except Exception as e:
+            await interaction.followup.send(f"An error occurred while syncing: {str(e)}", ephemeral=True)
+
     @client.tree.command(name="ping", description="Responds with Pong!")
     async def ping(interaction: discord.Interaction):
         print("pinged")
